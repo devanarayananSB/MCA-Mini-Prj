@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - RATS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card card-custom p-4 border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h1 class="fw-bold text-primary-emphasis"><i class="bi bi-speedometer2 text-success me-2"></i>Admin Dashboard</h1>
+                <p class="text-secondary">Welcome, {{ user.email }}! You have logged in as an <strong>Administrator</strong>.</p>
+                <hr>
+                <p class="mb-0">All authentication system hooks and role checking are operating normally.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

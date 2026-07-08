@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}My Profile - RATS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Card (Left) -->
+    <div class="col-md-4 mb-4">
+        <div class="card card-custom p-3 text-center border-0 shadow-sm">
+            <div class="card-body">
+                <div class="mb-3">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
+                    {% else %}
+                        <div class="bg-secondary-subtle rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                            <i class="bi bi-person text-secondary fs-1"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-success badge bg-success-subtle border border-success-subtle rounded-pill px-3">{{ user.get_role_display }}</p>
+                <div class="text-start mt-4 border-top pt-3">
+                    <p class="mb-2"><i class="bi bi-envelope text-secondary me-2"></i>{{ user.email }}</p>
+                    {% if user.profile.phone %}
+                        <p class="mb-2"><i class="bi bi-telephone text-secondary me-2"></i>{{ user.profile.phone }}</p>
+                    {% endif %}
+                    <p class="mb-0 text-muted small"><i class="bi bi-calendar3 me-2"></i>Joined {{ user.date_joined|date:"M Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Edit Form (Right) -->
+    <div class="col-md-8">
+        <div class="card card-custom p-4 border-0 shadow-sm">
+            <div class="card-body">
+                <h3 class="fw-bold text-primary-emphasis mb-4">Profile Settings</h3>
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ user.first_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ user.last_name }}" required>
+                        </div>
+                    </div>
+                    
+                    {% bootstrap_form form exclude="first_name,last_name" %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-secondary px-4 fw-semibold">
+                            <i class="bi bi-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

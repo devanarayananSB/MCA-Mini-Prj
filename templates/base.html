@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RATS - Recruitment & Applicant Tracking System{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/style.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Style Sheet -->
+    <style>
+        :root {
+            --primary-color: #0F172A;
+            --primary-hover: #1E293B;
+            --accent-color: #16A34A;
+            --accent-hover: #15803D;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #0F172A;
+            --text-muted: #475569;
+            --border-color: #E2E8F0;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #0F172A;
+            --primary-hover: #020617;
+            --accent-color: #16A34A;
+            --accent-hover: #22C55E;
+            --bg-color: #0F172A;
+            --card-bg: #1E293B;
+            --text-color: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .navbar-custom {
+            background-color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #FFFFFF;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            padding: 1.5rem 0;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card-custom {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-shield-check text-success me-2"></i>RATS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link px-3" href="{% url 'dashboard:index' %}">
+                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3" href="{% url 'accounts:profile_edit' %}">
+                                <i class="bi bi-person-circle me-1"></i> Profile
+                            </a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <form action="{% url 'accounts:logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-light">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link px-3" href="{% url 'accounts:login' %}">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-sm btn-primary px-3" href="{% url 'accounts:register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item ms-3">
+                        <button class="btn btn-sm btn-outline-secondary text-white border-0" id="themeToggleBtn">
+                            <i class="bi bi-moon-fill" id="themeIcon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container my-5">
+        <!-- Toast & Messages Alert -->
+        {% if messages %}
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show card-custom p-3 mb-4" role="alert">
+                            <div class="d-flex align-items-center">
+                                {% if message.tags == 'success' %}
+                                    <i class="bi bi-check-circle-fill text-success fs-4 me-2"></i>
+                                {% elif message.tags == 'error' %}
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4 me-2"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle-fill text-info fs-4 me-2"></i>
+                                {% endif %}
+                                <div>{{ message }}</div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <small>&copy; 2026 Recruitment and Applicant Tracking System (RATS). All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Theme Switcher Script -->
+    <script>
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // Load initial theme
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeUI(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const targetTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+            localStorage.setItem('theme', targetTheme);
+            updateThemeUI(targetTheme);
+        });
+
+        function updateThemeUI(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-sun-fill';
+            } else {
+                themeIcon.className = 'bi bi-moon-fill';
+            }
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
